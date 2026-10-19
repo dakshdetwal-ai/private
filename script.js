@@ -1,8 +1,6 @@
 
 /* =========================================
    DETwal Event Desk
-   Replace the key below with your actual
-   Supabase publishable key.
 ========================================= */
 
 const SUPABASE_URL =
@@ -101,8 +99,7 @@ $("timePreset").addEventListener("change", () => {
     yesterday: "Yesterday"
   };
 
-  $("eventTime").value =
-    presets[$("timePreset").value];
+  $("eventTime").value = presets[$("timePreset").value];
 });
 
 $("pair").addEventListener("change", () => {
@@ -120,9 +117,7 @@ async function loadEvents() {
   try {
     const { data, error } = await db
       .from("events")
-      .select(
-        "id, who, pair, position, event_time, published_at"
-      )
+      .select("id, who, pair, position, event_time")
       .order("id", { ascending: false });
 
     if (error) throw error;
@@ -161,13 +156,6 @@ async function loadEvents() {
           <span>
             Event time:
             <strong>${escapeHTML(item.event_time)}</strong>
-          </span>
-
-          <span>
-            Published:
-            ${escapeHTML(
-              new Date(item.published_at).toLocaleString()
-            )}
           </span>
         </div>
       </article>
