@@ -1,0 +1,112 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DETwal | Event Desk</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#">DET<span>wal</span></a>
+    <span class="status"><i></i> EVENT DESK</span>
+  </header>
+
+  <main>
+    <section id="loginView" class="login-card">
+      <div class="brand-icon">D</div>
+      <p class="eyebrow">PRIVATE ACCESS</p>
+      <h1>Welcome back.</h1>
+      <p class="muted">Enter your universal access password.</p>
+
+      <form id="loginForm">
+        <label for="password">ACCESS PASSWORD</label>
+        <input id="password" type="password" placeholder="Enter password"
+               inputmode="numeric" required autofocus>
+        <button class="primary full" type="submit">Unlock dashboard →</button>
+        <p id="loginError" class="error"></p>
+      </form>
+    </section>
+
+    <section id="dashboard" class="hidden">
+      <div class="page-heading">
+        <div>
+          <span id="roleBadge" class="eyebrow">USER PANEL</span>
+          <h1 id="pageTitle">Event Feed</h1>
+          <p class="muted">All published events, with their original event times.</p>
+        </div>
+        <button id="logoutBtn" class="secondary">Lock panel</button>
+      </div>
+
+      <section id="adminPanel" class="panel hidden">
+        <h2>Publish an event</h2>
+        <form id="eventForm" class="event-form">
+          <div class="field">
+            <label for="who">BY / NAME</label>
+            <input id="who" maxlength="80" placeholder="Enter name" required>
+          </div>
+
+          <div class="field">
+            <label for="pair">PAIR</label>
+            <select id="pair">
+              <option>XAUUSD</option>
+              <option>ETHUSD</option>
+              <option>BTCUSD</option>
+              <option>EURUSD</option>
+              <option>OTHER</option>
+            </select>
+          </div>
+
+          <div class="field hidden" id="customPairWrap">
+            <label for="customPair">CUSTOM PAIR</label>
+            <input id="customPair" placeholder="Enter pair">
+          </div>
+
+          <div class="field">
+            <label for="position">POSITION</label>
+            <select id="position">
+              <option value="BUY">BUY</option>
+              <option value="SELL">SELL</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="timePreset">TIME PRESET</label>
+            <select id="timePreset">
+              <option value="default">7 minutes (default)</option>
+              <option value="5">5 minutes before</option>
+              <option value="anytime">Anytime / custom</option>
+              <option value="yesterday">Yesterday</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="eventTime">EVENT TIME (DISPLAY LABEL)</label>
+            <input id="eventTime" maxlength="80" value="7 minutes"
+                   placeholder="e.g. 06:00 PM" required>
+          </div>
+
+          <button class="primary" type="submit">Confirm & publish</button>
+          <p id="publishMessage" class="message"></p>
+        </form>
+      </section>
+
+      <section class="panel">
+        <div class="feed-heading">
+          <h2>Published events</h2>
+          <span id="eventCount" class="count">0 events</span>
+        </div>
+        <div id="eventsList" class="events-list">
+          <p class="muted">Loading events...</p>
+        </div>
+        <p id="feedMessage" class="message"></p>
+      </section>
+    </section>
+  </main>
+
+  <footer>DETwal Event Desk · Use information responsibly</footer>
+</body>
+</html>
