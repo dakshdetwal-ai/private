@@ -1,0 +1,212 @@
+
+:root {
+  --bg: #080d16;
+  --panel: #101827;
+  --line: #27344a;
+  --text: #edf3ff;
+  --muted: #94a2b8;
+  --blue: #7898ff;
+  --green: #36d6a0;
+  --red: #ff7180;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--text);
+  background: radial-gradient(ellipse at top, #172541, var(--bg) 60%);
+  font-family: Inter, system-ui, Arial, sans-serif;
+}
+
+.topbar {
+  max-width: 1100px;
+  margin: auto;
+  padding: 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #263247;
+}
+
+.brand {
+  color: white;
+  font-size: 25px;
+  font-weight: 850;
+  text-decoration: none;
+  letter-spacing: -1px;
+}
+
+.brand span { color: var(--blue); }
+
+.status, .count {
+  border: 1px solid var(--line);
+  padding: 7px 12px;
+  border-radius: 30px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.status i {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--green);
+}
+
+main {
+  width: min(100% - 28px, 1000px);
+  margin: 45px auto;
+}
+
+.login-card, .panel {
+  border: 1px solid var(--line);
+  background: rgba(16, 24, 39, .96);
+  border-radius: 18px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.login-card {
+  max-width: 430px;
+  margin: 7vh auto;
+}
+
+.brand-icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, #82a5ff, #6265ef);
+  font-size: 23px;
+  font-weight: 800;
+}
+
+h1 { font-size: clamp(28px, 5vw, 38px); margin: 10px 0; }
+h2 { font-size: 18px; margin: 0 0 20px; }
+p { line-height: 1.6; }
+.muted { color: var(--muted); }
+.eyebrow { color: #a8baff; font-size: 12px; letter-spacing: 1.4px; }
+label { display: block; margin-bottom: 8px; color: #b9c6da; font-size: 12px; font-weight: 700; }
+
+input, select {
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--text);
+  background: #0a111e;
+  font: inherit;
+}
+
+input:focus, select:focus {
+  outline: 1px solid var(--blue);
+  border-color: var(--blue);
+}
+
+.field { margin-bottom: 16px; }
+
+button {
+  padding: 12px 16px;
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 750;
+}
+
+.primary {
+  color: white;
+  background: linear-gradient(135deg, #7da1ff, #6265ef);
+}
+
+.full { width: 100%; margin-top: 14px; }
+.secondary { color: var(--text); background: #182338; border: 1px solid var(--line); }
+
+.page-heading, .feed-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+
+.page-heading h1 { margin-bottom: 5px; }
+.page-heading p { margin-top: 5px; }
+
+.event-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 16px;
+}
+
+.event-form button, .event-form .message { align-self: start; }
+.events-list { display: grid; gap: 12px; }
+
+.event {
+  background: #0b1422;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  padding: 17px;
+}
+
+.event-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.event-pair { font-size: 20px; font-weight: 800; }
+.event-name { color: var(--muted); font-size: 13px; margin-top: 4px; }
+
+.side {
+  padding: 6px 9px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.buy { color: var(--green); background: #123b31; }
+.sell { color: var(--red); background: #421f2b; }
+
+.event-meta {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.message, .error { font-size: 13px; }
+.error { color: var(--red); }
+.message { color: var(--muted); }
+.hidden { display: none !important; }
+
+.empty {
+  padding: 28px;
+  text-align: center;
+  color: var(--muted);
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+@media (max-width: 600px) {
+  main { margin-top: 25px; }
+  .event-form { grid-template-columns: 1fr; }
+  .login-card, .panel { padding: 18px; }
+}
