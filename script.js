@@ -1,11 +1,27 @@
 
-const SUPABASE_URL = "https://evsnwenvmwhrohyzrjqq.supabase.co";
-const SUPABASE_KEY = "YOUR_SUPABASE_PUBLISHABLE_KEY";
+/* =========================================
+   DETwal Event Desk
+   Replace the key below with your actual
+   Supabase publishable key.
+========================================= */
 
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_URL =
+  "https://evsnwenvmwhrohyzrjqq.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_Vfy2VLbqRYB_DOsK13iuqA_9-pk4Q5t";
+
+const db = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
 
 const $ = (id) => document.getElementById(id);
+
 let role = null;
+let refreshTimer = null;
+
+/* ---------- Helpers ---------- */
 
 function escapeHTML(value) {
   return String(value ?? "").replace(/[&<>"']/g, (char) => ({
@@ -17,29 +33,15 @@ function escapeHTML(value) {
   })[char]);
 }
 
-function setMessage(id, message, error = false) {
-  $(id).textContent = message;
-  $(id).style.color = error ? "#ff7180" : "#36d6a0";
+function setMessage(id, message, isError = false) {
+  const element = $(id);
+  if (!element) return;
+
+  element.textContent = message;
+  element.style.color = isError ? "#ff7180" : "#36d6a0";
 }
 
-function updatePreset() {
-  const preset = $("timePreset").value;
-  const values = {
-    default: "7 minutes",
-    "5": "5 minutes before",
-    anytime: "",
-    yesterday: "Yesterday"
-  };
-  $("eventTime").value = values[preset];
-}
-
-$("timePreset").addEventListener("change", updatePreset);
-
-$("pair").addEventListener("change", () => {
-  $("customPairWrap").classList.toggle(
-    "hidden", $("pair").value !== "OTHER"
-  );
-});
+/* ---------- Login ---------- */
 
 $("loginForm").addEventListener("submit", (event) => {
   event.preventDefault();
@@ -65,124 +67,207 @@ $("loginForm").addEventListener("submit", (event) => {
   $("pageTitle").textContent =
     role === "admin" ? "Manage Events" : "Event Feed";
 
-  $("adminPanel").classList.toggle("hidden", role !== "admin");
+  $("adminPanel").classList.toggle(
+    "hidden",
+    role !== "admin"
+  );
 
   loadEvents();
+
+  clearInterval(refreshTimer);
+  refreshTimer = setInterval(() => {
+    if (role) loadEvents();
+  }, 10000);
 });
+
+/* ---------- Logout ---------- */
 
 $("logoutBtn").addEventListener("click", () => {
   role = null;
+  clearInterval(refreshTimer);
+
   $("password").value = "";
   $("dashboard").classList.add("hidden");
   $("loginView").classList.remove("hidden");
 });
 
+/* ---------- Event form controls ---------- */
+
+$("timePreset").addEventListener("change", () => {
+  const presets = {
+    default: "7 minutes",
+    "5": "5 minutes before",
+    anytime: "",
+    yesterday: "Yesterday"
+  };
+
+  $("eventTime").value =
+    presets[$("timePreset").value];
+});
+
+$("pair").addEventListener("change", () => {
+  $("customPairWrap").classList.toggle(
+    "hidden",
+    $("pair").value !== "OTHER"
+  );
+});
+
+/* ---------- Load shared events ---------- */
+
 async function loadEvents() {
-  $("eventsList").innerHTML =
-    '<p class="muted">Loading events...</p>';
+  const list = $("eventsList");
 
-  const { data, error } = await db
-    .from("events")
-    .select("id, who, pair, position, event_time, published_at")
-    .order("id", { ascending: false });
+  try {
+    const { data, error } = await db
+      .from("events")
+      .select(
+        "id, who, pair, position, event_time, published_at"
+      )
+      .order("id", { ascending: false });
 
-  if (error) {
-    $("eventsList").innerHTML =
-      '<div class="empty">Could not load events.</div>';
-    setMessage("feedMessage", error.message, true);
-    return;
-  }
+    if (error) throw error;
 
-  setMessage("feedMessage", "");
+    $("eventCount").textContent =
+      `${data.length} event${data.length === 1 ? "" : "s"}`;
 
-  $("eventCount").textContent =
-    `${data.length} event${data.length === 1 ? "" : "s"}`;
+    setMessage("feedMessage", "");
 
-  if (data.length === 0) {
-    $("eventsList").innerHTML =
-      '<div class="empty">No events published yet.</div>';
-    return;
-  }
+    if (!data.length) {
+      list.innerHTML =
+        '<div class="empty">No events published yet.</div>';
+      return;
+    }
 
-  $("eventsList").innerHTML = data.map((item) => `
-    <article class="event">
-      <div class="event-top">
-        <div>
-          <div class="event-pair">${escapeHTML(item.pair)}</div>
-          <div class="event-name">By ${escapeHTML(item.who)}</div>
+    list.innerHTML = data.map((item) => `
+      <article class="event">
+        <div class="event-top">
+          <div>
+            <div class="event-pair">
+              ${escapeHTML(item.pair)}
+            </div>
+            <div class="event-name">
+              By ${escapeHTML(item.who)}
+            </div>
+          </div>
+
+          <span class="side ${
+            item.position === "BUY" ? "buy" : "sell"
+          }">
+            ${escapeHTML(item.position)}
+          </span>
         </div>
-        <span class="side ${item.position === "BUY" ? "buy" : "sell"}">
-          ${escapeHTML(item.position)}
-        </span>
-      </div>
-      <div class="event-meta">
-        <span>Event time: <strong>${escapeHTML(item.event_time)}</strong></span>
-        <span>Published: ${escapeHTML(
-          new Date(item.published_at).toLocaleString()
-        )}</span>
-      </div>
-    </article>
-  `).join("");
+
+        <div class="event-meta">
+          <span>
+            Event time:
+            <strong>${escapeHTML(item.event_time)}</strong>
+          </span>
+
+          <span>
+            Published:
+            ${escapeHTML(
+              new Date(item.published_at).toLocaleString()
+            )}
+          </span>
+        </div>
+      </article>
+    `).join("");
+
+  } catch (error) {
+    console.error("Load events failed:", error);
+
+    list.innerHTML =
+      '<div class="empty">Could not load events. Check connection and database permissions.</div>';
+
+    setMessage(
+      "feedMessage",
+      `${error.message || "Network request failed."} Check F12 → Console for details.`,
+      true
+    );
+  }
 }
+
+/* ---------- Publish event ---------- */
 
 $("eventForm").addEventListener("submit", async (event) => {
   event.preventDefault();
 
-  if (role !== "admin") return;
+  if (role !== "admin") {
+    setMessage("publishMessage", "Admin panel required.", true);
+    return;
+  }
 
   const who = $("who").value.trim();
+
   const pair = $("pair").value === "OTHER"
     ? $("customPair").value.trim().toUpperCase()
     : $("pair").value;
 
   const position = $("position").value;
-  const eventTime = $("eventTime").value.trim() || "Anytime";
+  const eventTime =
+    $("eventTime").value.trim() || "Anytime";
 
   if (!who || !pair) {
-    setMessage("publishMessage", "Please complete all required fields.", true);
+    setMessage(
+      "publishMessage",
+      "Please complete the name and pair fields.",
+      true
+    );
     return;
   }
-
-  const presetLabels = {
-    default: "7 minutes (default)",
-    "5": "5 minutes before",
-    anytime: "Anytime / custom",
-    yesterday: "Yesterday"
-  };
 
   const button = event.submitter;
   button.disabled = true;
   button.textContent = "Publishing...";
 
-  const { error } = await db.from("events").insert({
-    who,
-    pair,
-    position,
-    event_time: eventTime
-  });
+  try {
+    const { error } = await db
+      .from("events")
+      .insert({
+        who: who,
+        pair: pair,
+        position: position,
+        event_time: eventTime
+      });
 
-  button.disabled = false;
-  button.textContent = "Confirm & publish";
+    if (error) throw error;
 
-  if (error) {
-    setMessage("publishMessage", error.message, true);
-    return;
+    setMessage(
+      "publishMessage",
+      "Event published successfully!"
+    );
+
+    $("eventForm").reset();
+    $("timePreset").value = "default";
+    $("eventTime").value = "7 minutes";
+    $("customPairWrap").classList.add("hidden");
+
+    await loadEvents();
+
+  } catch (error) {
+    console.error("Publish event failed:", error);
+
+    let message = error.message ||
+      "Could not reach Supabase.";
+
+    if (error.code === "42501") {
+      message =
+        "Database permission denied. Check your INSERT policy.";
+    } else if (error.code === "42P01") {
+      message =
+        "Events table not found. Check the table name.";
+    } else if (
+      error instanceof TypeError ||
+      /failed to fetch|network/i.test(message)
+    ) {
+      message =
+        "Network request failed. Check the Supabase URL, publishable key, internet connection, and browser Console.";
+    }
+
+    setMessage("publishMessage", message, true);
+
+  } finally {
+    button.disabled = false;
+    button.textContent = "Confirm & publish";
   }
-
-  setMessage(
-    "publishMessage",
-    `Event published. Preset: ${presetLabels[$("timePreset").value]}`
-  );
-
-  $("eventForm").reset();
-  $("timePreset").value = "default";
-  updatePreset();
-  $("customPairWrap").classList.add("hidden");
-
-  await loadEvents();
 });
-
-// Automatically refresh the feed every 10 seconds.
-setInterval(() => {
-  if (role) loadEvents();
-}, 10000);
